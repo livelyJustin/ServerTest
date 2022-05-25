@@ -6,3 +6,6 @@ Study TCP Sever for GAME
 
 2022.05.25
 Thread 생성 및 Start, Name 변경, Join을 통해 동기시키기
+
+2022.05.25
+ThreadPool, Task 개념 숙지 및 사용
