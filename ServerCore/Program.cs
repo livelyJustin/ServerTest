@@ -1,29 +1,36 @@
-﻿namespace ServerCore
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+
+namespace ServerCore
 {
     class Program
     {
+        int _answer;
+        bool _complete;
+
+        void T1()
+        {
+            _answer = 123; 
+            Thread.MemoryBarrier(); // _answer = 123이 들어간걸 메모리에 알려줘(Store)
+            _complete = true;
+            Thread.MemoryBarrier(); // _complete = true가 들어간걸 메모리에 알려줘(Store)
+        }
+        void RNG()
+        {
+            Thread.MemoryBarrier(); // _complet의 최신 값을 알려줘(Load)
+
+            if (_complete)
+            {
+                Thread.MemoryBarrier(); // _answer의 최신 값을 알려줘(Load)
+                Console.WriteLine(_answer);
+            }
+        }
+
         static void Main(string[] args)
         {
-            int[,] arr = new int[10000, 10000];
-            {
-                long now = DateTime.Now.Ticks;
-                for (int i = 0; i < 10000; i++)
-                    for (int j = 0; j < 10000; j++)
-                        arr[i, j] = 1;
-                long end = DateTime.Now.Ticks;
-                Console.WriteLine($"(j, i) 순서 걸린 시간 {end - now}");
-            }
-
-
-            {
-                long now = DateTime.Now.Ticks;
-                for (int i = 0; i < 10000; i++)
-                    for (int j = 0; j < 10000; j++)
-                        arr[j, i] = 1;
-                long end = DateTime.Now.Ticks;
-                Console.WriteLine($"(i, j) 순서 걸린 시간  {end - now}");
-            }
-
+           
         }
     }
 }
