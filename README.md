@@ -19,3 +19,7 @@ https://velog.io/@livelyjuseok/개인공부-서버-실습4-최적화-예외처�
 2022.05.27
 캐시 이론 및 실습
 https://velog.io/@livelyjuseok/개인공부-서버-실습4-캐시-이론
+
+2022.05.28
+Memory Barrier 공부 및 실습
+https://velog.io/@livelyjuseok/개인공부-서버-실습5-Memory-Barrier
