@@ -23,3 +23,7 @@ https://velog.io/@livelyjuseok/개인공부-서버-실습4-캐시-이론
 2022.05.28
 Memory Barrier 공부 및 실습
 https://velog.io/@livelyjuseok/개인공부-서버-실습5-Memory-Barrier
+
+2022.05.29
+원자성 개념 배움, Interlocked 사용
+https://velog.io/@livelyjuseok/개인공부-서버-실습7-Interlocked
