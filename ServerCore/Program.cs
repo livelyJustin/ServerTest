@@ -1,36 +1,32 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-
-namespace ServerCore
+﻿namespace ServerCore
 {
     class Program
     {
-        int _answer;
-        bool _complete;
+        static int num = 0;
 
-        void T1()
+        static void Thread1()
         {
-            _answer = 123; 
-            Thread.MemoryBarrier(); // _answer = 123이 들어간걸 메모리에 알려줘(Store)
-            _complete = true;
-            Thread.MemoryBarrier(); // _complete = true가 들어간걸 메모리에 알려줘(Store)
+
+            for (int i = 0; i < 10000; i++)
+                Interlocked.Increment(ref num);
+
         }
-        void RNG()
+        static void Thread2()
         {
-            Thread.MemoryBarrier(); // _complet의 최신 값을 알려줘(Load)
-
-            if (_complete)
-            {
-                Thread.MemoryBarrier(); // _answer의 최신 값을 알려줘(Load)
-                Console.WriteLine(_answer);
-            }
+            for (int i = 0; i < 10000; i++)
+                Interlocked.Decrement(ref num);
         }
 
         static void Main(string[] args)
         {
-           
+            Task t = new Task(Thread1);
+            Task t2 = new Task(Thread2);
+            t.Start();
+            t2.Start();
+
+            Task.WaitAll(t, t2);
+
+            Console.WriteLine(num);
         }
     }
 }
