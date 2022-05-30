@@ -3,18 +3,30 @@
     class Program
     {
         static int num = 0;
-
+        static object key = new object();
         static void Thread1()
         {
-
-            for (int i = 0; i < 10000; i++)
-                Interlocked.Increment(ref num);
+            lock (key)
+            {
+                for (int i = 0; i < 10000; i++)
+                {
+                    num++;
+                    return;
+                }
+            }
 
         }
         static void Thread2()
         {
-            for (int i = 0; i < 10000; i++)
-                Interlocked.Decrement(ref num);
+            lock (key)
+            {
+                for (int i = 0; i < 10000; i++)
+                {
+                    num--;
+                    return;
+                }
+
+            }
         }
 
         static void Main(string[] args)
