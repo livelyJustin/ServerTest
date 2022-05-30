@@ -27,3 +27,7 @@ https://velog.io/@livelyjuseok/개인공부-서버-실습5-Memory-Barrier
 2022.05.29
 원자성 개념 배움, Interlocked 사용
 https://velog.io/@livelyjuseok/개인공부-서버-실습7-Interlocked
+
+2022.05.29
+Interlocked 단점, Monitor.Enter & Exit 사용, 가장 편한 lock 키워드 사용
+https://velog.io/@livelyjuseok/개인공부-서버-실습7-Lock-기초
