@@ -33,5 +33,9 @@ Interlocked 단점, Monitor.Enter & Exit 사용, 가장 편한 lock 키워드 �
 https://velog.io/@livelyjuseok/개인공부-서버-실습7-Lock-기초
 
 2022.05.31
-lock이 두 개일 경우 발생할 수 있는 DeadLock 구현 및 해결
+Lock이 두 개일 경우 발생할 수 있는 DeadLock 구현 및 해결
 https://velog.io/@livelyjuseok/개인공부-서버-실습8-DeadLock
+
+2022.06.01
+Lock 구현 이론 
+https://velog.io/@livelyjuseok/개인공부-서버실습9-Lock-구현-이론
