@@ -1,43 +1,45 @@
 ﻿namespace ServerCore
 {
-    class SpinLock
+
+    public class SpinLock
     {
-        volatile public bool _lock = false; // 1이면 탈출
+        volatile public int _lock = 0;
         public void Acquire()
         {
-            while (_lock)
+            while(true)
             {
-                // 잠김이 풀리기를 기다리는중
+                int origin =  Interlocked.CompareExchange(ref _lock, 1, 0);
+                if (origin == 0)
+                    break;
             }
-            _lock = true;
         }
         public void Release()
         {
-            _lock = false;
+            _lock = 0;
         }
     }
 
-    class Program
+    public  class Program
     {
-        static int num = 0;
-        static SpinLock spinLock = new SpinLock();
+        static SpinLock spin = new SpinLock();
+        public static int num = 0;
 
         static void Thread_1()
         {
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 100; i++)
             {
-                spinLock.Acquire();
+                spin.Acquire();
                 num++;
-                spinLock.Release();
+                spin.Release();
             }
         }
         static void Thread_2()
         {
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 100; i++)
             {
-                spinLock.Acquire();
+                spin.Acquire();
                 num--;
-                spinLock.Release();
+                spin.Release();
             }
         }
         static void Main(string[] args)
@@ -49,7 +51,6 @@
             t1.Start();
 
             Task.WaitAll(t, t1);
-
             Console.WriteLine(num);
         }
     }
