@@ -1,71 +1,56 @@
 ﻿namespace ServerCore
 {
-    class PlaySection
+    class SpinLock
     {
-        static object key1 = new object();
-
-        public static void Test()
+        volatile public bool _lock = false; // 1이면 탈출
+        public void Acquire()
         {
-            lock (key1)
+            while (_lock)
             {
-                UserSection.UserAction();
+                // 잠김이 풀리기를 기다리는중
             }
+            _lock = true;
         }
-
-        public static void PlayAction()
+        public void Release()
         {
-            lock (key1)
-            {
-            }
-        }
-
-    }
-
-    class UserSection
-    {
-        static object key2 = new object();
-
-        public static void Test()
-        {
-            lock (key2)
-            {
-                PlaySection.PlayAction();
-            }
-        }
-        public static void UserAction()
-        {
-            lock (key2)
-            {
-            }
+            _lock = false;
         }
     }
 
     class Program
     {
-        static void Thread1()
-        {
-            for (int i = 0; i < 10000; i++)
-            {
-                PlaySection.Test();
-            }
-        }
-        static void Thread2()
-        {
-            for (int i = 0; i < 10000; i++)
-            {
-                UserSection.Test();
-            }
-        }
+        static int num = 0;
+        static SpinLock spinLock = new SpinLock();
 
+        static void Thread_1()
+        {
+            for (int i = 0; i < 10000; i++)
+            {
+                spinLock.Acquire();
+                num++;
+                spinLock.Release();
+            }
+        }
+        static void Thread_2()
+        {
+            for (int i = 0; i < 10000; i++)
+            {
+                spinLock.Acquire();
+                num--;
+                spinLock.Release();
+            }
+        }
         static void Main(string[] args)
         {
-            Task t = new Task(Thread1);
-            Task t2 = new Task(Thread2);
-            t.Start();
-            Thread.Sleep(100);
-            t2.Start();
+            Task t = new Task(Thread_1);
+            Task t1 = new Task(Thread_2);
 
-            Task.WaitAll(t, t2);
+            t.Start();
+            t1.Start();
+
+            Task.WaitAll(t, t1);
+
+            Console.WriteLine(num);
         }
     }
 }
