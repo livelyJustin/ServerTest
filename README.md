@@ -42,4 +42,8 @@ https://velog.io/@livelyjuseok/개인공부-서버실습9-Lock-구현-이론
 
 2022.06.02
 SpinLock 구현 및 문제 해결
-https://velog.io/@livelyjuseok/%EA%B0%9C%EC%9D%B8%EA%B3%B5%EB%B6%80-%EC%84%9C%EB%B2%84%EC%8B%A4%EC%8A%B510-SpinLock
+https://velog.io/@livelyjuseok/개인공부-서버실습10-SpinLock
+
+2022.06.03
+Context SWitching 개념 이해
+https://velog.io/@livelyjuseok/개인공부-서버실습11-Context-Switching
