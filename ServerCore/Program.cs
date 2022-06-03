@@ -11,6 +11,8 @@
                 int origin =  Interlocked.CompareExchange(ref _lock, 1, 0);
                 if (origin == 0)
                     break;
+
+                Thread.Yield();
             }
         }
         public void Release()
