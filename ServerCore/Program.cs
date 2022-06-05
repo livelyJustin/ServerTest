@@ -1,49 +1,29 @@
 ﻿namespace ServerCore
 {
-
-    public class SpinLock
+    public class Program
     {
-        volatile public int _lock = 0;
-        public void Acquire()
-        {
-            while(true)
-            {
-                int origin =  Interlocked.CompareExchange(ref _lock, 1, 0);
-                if (origin == 0)
-                    break;
-
-                Thread.Yield();
-            }
-        }
-        public void Release()
-        {
-            _lock = 0;
-        }
-    }
-
-    public  class Program
-    {
-        static SpinLock spin = new SpinLock();
+        static Mutex mutex = new Mutex();
         public static int num = 0;
 
         static void Thread_1()
         {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000; i++)
             {
-                spin.Acquire();
+                mutex.WaitOne();
                 num++;
-                spin.Release();
+                mutex.ReleaseMutex();
             }
         }
         static void Thread_2()
         {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000; i++)
             {
-                spin.Acquire();
+                mutex.WaitOne();
                 num--;
-                spin.Release();
+                mutex.ReleaseMutex();
             }
         }
+
         static void Main(string[] args)
         {
             Task t = new Task(Thread_1);
