@@ -2,38 +2,53 @@
 {
     public class Program
     {
-        static Mutex mutex = new Mutex();
-        public static int num = 0;
+        static object key = new object();
+        static SpinLock spin = new SpinLock();
+        static bool key2;
 
-        static void Thread_1()
+
+        class Reward
         {
-            for (int i = 0; i < 1000; i++)
-            {
-                mutex.WaitOne();
-                num++;
-                mutex.ReleaseMutex();
-            }
+            
         }
-        static void Thread_2()
+        static ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim();
+
+        static Reward GetRewardID(int id)
         {
-            for (int i = 0; i < 1000; i++)
+            rwLock.EnterReadLock();
+            rwLock.ExitReadLock();
+
+            lock (key)
             {
-                mutex.WaitOne();
-                num--;
-                mutex.ReleaseMutex();
+
+            }
+            return null;
+        }
+        static void AddReward(Reward reward)
+        {
+            rwLock.EnterWriteLock();
+            rwLock.ExitWriteLock();
+            lock (key)
+            {
+
             }
         }
 
         static void Main(string[] args)
         {
-            Task t = new Task(Thread_1);
-            Task t1 = new Task(Thread_2);
+            lock (key)
+            {
 
-            t.Start();
-            t1.Start();
-
-            Task.WaitAll(t, t1);
-            Console.WriteLine(num);
+            }
+            try
+            {
+                spin.Enter(ref key2);
+            }
+            finally
+            {
+                if (key2)
+                    spin.Exit();
+            }
         }
     }
 }
