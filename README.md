@@ -56,4 +56,5 @@ Context SWitching 개념 이해
 https://velog.io/@livelyjuseok/개인공부-서버실습12-Auto-Reset-Event
 
 2022.06.06
-Reader Writer
+Reader Writer Lock 개념 잡기
+https://velog.io/@livelyjuseok/개인공부-서버실습12-ReaderWriterLock-개념
