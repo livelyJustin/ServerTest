@@ -62,3 +62,7 @@ https://velog.io/@livelyjuseok/개인공부-서버실습12-ReaderWriterLock-개�
 2022.06.07-08
 Reader Writer Lock 구현
 https://velog.io/@livelyjuseok/개인공부-서버실습13-ReaderWriterLock-구현
+
+2022.06.09
+Thread Local Storage 구현
+https://velog.io/@livelyjuseok/개인공부-서버실습14-Thread-Local-Storage
