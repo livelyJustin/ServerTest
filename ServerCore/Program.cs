@@ -2,53 +2,34 @@
 {
     public class Program
     {
-        static object key = new object();
-        static SpinLock spin = new SpinLock();
-        static bool key2;
-
-
-        class Reward
-        {
-            
-        }
-        static ReaderWriterLockSlim rwLock = new ReaderWriterLockSlim();
-
-        static Reward GetRewardID(int id)
-        {
-            rwLock.EnterReadLock();
-            rwLock.ExitReadLock();
-
-            lock (key)
-            {
-
-            }
-            return null;
-        }
-        static void AddReward(Reward reward)
-        {
-            rwLock.EnterWriteLock();
-            rwLock.ExitWriteLock();
-            lock (key)
-            {
-
-            }
-        }
-
+        static volatile  int count = 0;
+        static Lock _lock = new Lock();
         static void Main(string[] args)
         {
-            lock (key)
+            Task t = new Task(delegate
             {
+                for (int i = 0; i < 10; i++)
+                {
+                    _lock.WriteLock();
+                    count++;
+                    _lock.WriteUnlock();
+                }
+            });
+            Task t2 = new Task(delegate
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    _lock.WriteLock();
+                    count--;
+                    _lock.WriteUnlock();
+                }
+            });
 
-            }
-            try
-            {
-                spin.Enter(ref key2);
-            }
-            finally
-            {
-                if (key2)
-                    spin.Exit();
-            }
+            t.Start();
+            t2.Start();
+
+            Task.WaitAll(t, t2);
+            Console.WriteLine("카운트는? " + count);
         }
     }
 }
