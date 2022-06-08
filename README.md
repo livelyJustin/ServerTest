@@ -58,3 +58,7 @@ https://velog.io/@livelyjuseok/개인공부-서버실습12-Auto-Reset-Event
 2022.06.06
 Reader Writer Lock 개념 잡기
 https://velog.io/@livelyjuseok/개인공부-서버실습12-ReaderWriterLock-개념
+
+2022.06.07-08
+Reader Writer Lock 구현
+https://velog.io/@livelyjuseok/개인공부-서버실습13-ReaderWriterLock-구현
