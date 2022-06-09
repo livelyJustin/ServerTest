@@ -66,3 +66,7 @@ https://velog.io/@livelyjuseok/개인공부-서버실습13-ReaderWriterLock-구�
 2022.06.09
 Thread Local Storage 구현
 https://velog.io/@livelyjuseok/개인공부-서버실습14-Thread-Local-Storage
+
+2022.06.10
+네트워크 기초
+https://velog.io/@livelyjuseok/개인공부-서버실습14-Thread-Local-Storage
