@@ -70,3 +70,7 @@ https://velog.io/@livelyjuseok/개인공부-서버실습14-Thread-Local-Storage
 2022.06.10
 네트워크 기초
 https://velog.io/@livelyjuseok/개인공부-서버실습14-Thread-Local-Storage
+
+2022.06.10
+TCP/IP 5계층 구조 
+https://velog.io/@livelyjuseok/개인공부-서버실습18-통신모델-TCPIP
