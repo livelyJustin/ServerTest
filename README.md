@@ -74,4 +74,6 @@ https://velog.io/@livelyjuseok/개인공부-서버실습17-네트워크-기초-�
 네트워크 TCP/IP 5 계층 구조
 https://velog.io/@livelyjuseok/개인공부-서버실습18-통신모델-TCPIP
 
+2022.06.11
+소켓 프로그래밍 기초 + 구현
 
