@@ -76,4 +76,4 @@ https://velog.io/@livelyjuseok/개인공부-서버실습18-통신모델-TCPIP
 
 2022.06.11
 소켓 프로그래밍 기초 + 구현
-
+https://velog.io/@livelyjuseok/개인공부-서버실습19-소켓프로그래밍-기초
