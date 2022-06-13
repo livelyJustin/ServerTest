@@ -85,3 +85,7 @@ https://velog.io/@livelyjuseok/개인공부-서버실습19-서버-코드-구분-
 2022.06.13
 소켓 프로그래밍 구현 코드 구분 - Receive
 https://velog.io/@livelyjuseok/개인공부-서버실습20-서버-코드-구분-비동기-처리2
+
+2022.06.14
+소켓 프로그래밍 구현 코드 구분 - Send
+https://velog.io/@livelyjuseok/개인공부-서버실습22-서버-코드-구분-비동기-처리3
