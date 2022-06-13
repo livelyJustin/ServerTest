@@ -15,8 +15,8 @@ namespace DummyClient
             IPEndPoint endPoint = new IPEndPoint(ipAddr, 2222); // 식당 주소, 뒷문 후문인지는 똑같음
 
             // 연락할 휴대폰 생성
-            
-            while(true)
+
+            while (true)
             {
                 Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
@@ -28,8 +28,12 @@ namespace DummyClient
                     // 어떤 녀석한테 연결 됐나 확인
 
                     // 보낸다음 받을 예정
-                    byte[] sendBuff = Encoding.UTF8.GetBytes("서버야.. 자니..?"); // string을 bytes 타입으로 변경
-                    int sendBytes = socket.Send(sendBuff); // 주의 실제로 이러면 계속 대기함
+                    for (int i = 0; i < 5; i++)
+                    {
+                        byte[] sendBuff = Encoding.UTF8.GetBytes($"서버야.. 자니..? {i}"); // string을 bytes 타입으로 변경
+                        int sendBytes = socket.Send(sendBuff); // 주의 실제로 이러면 계속 대기함
+                    }
+
 
                     // 받는다 서버가 나한테 얼마나 보낼지 모르늬 크게 만든다
                     byte[] recvBuff = new byte[1024];
@@ -48,7 +52,7 @@ namespace DummyClient
 
                 Thread.Sleep(1000);
             }
-            
+
         }
     }
 }

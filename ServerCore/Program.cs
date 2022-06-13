@@ -7,24 +7,26 @@ namespace ServerCore
     class Program
     {
         static Listener _listener = new Listener();
+
         static void OnAcceptEventHandler(Socket clientSocket)
         {
             try
             {
-                // 받는다
-                byte[] recvBuff = new byte[1024]; // 좀 크게 생성
-                int recvBytes = clientSocket.Receive(recvBuff); // 받은 정보는 recv에 넣고 몇 바이트인지는 recvBytes 저장
-                string recvData = Encoding.UTF8.GetString(recvBuff, 0, recvBytes);  // 변환하고자 하는 값, 시작 인덱스, 문자열 몇개짜리인지 설정
-                                                                                    // 문자열을 받는다는 가정이기에 이렇게 간단
-                                                                                    // 문자열로 소통하기에 endcording; UTF-8로 통일
-                Console.WriteLine($"[From Client] {recvData}");
+              
+                // Accept를 성공적으로 해서 해당함수가 호출 될 시에 Session을 생성
+                // 경우에 따라 미리 만들어두고 사용할 수도 있음
+                Session _session = new Session();
+
+                _session.Start(clientSocket);
                 // 보낸다
                 byte[] sendBuff = Encoding.UTF8.GetBytes("Welcome to Justin Server"); // 문자열을 바로 보낼 수 있는 타입으로 바꿔준거
-                clientSocket.Send(sendBuff);
+                _session.Send(sendBuff);
 
-                // 끝낸다.
-                clientSocket.Shutdown(SocketShutdown.Both); // 조금 더 우아하게 쫓아내는 방법? 나중에 알려줌
-                clientSocket.Close();
+                Thread.Sleep(1000);
+
+                _session.Disconnect();
+
+
             }
             catch (Exception e)
             {
