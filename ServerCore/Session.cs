@@ -13,33 +13,34 @@ namespace ServerCore
 
         // 실제로 바로 sendAsyn를 하는게 아나리 담아두었다가 꺼냈다가 할 큐
         Queue<byte[]> _sendQueue = new Queue<byte[]>();
-        bool _pending = false; // 실행 중일 때는 바로 실행하지 않고, 큐에다가 저장해놓기 위함
+        //bool _pending = false; // 실행 중일 때는 바로 실행하지 않고, 큐에다가 저장해놓기 위함
+        List<ArraySegment<byte>> _pendingList = new List<ArraySegment<byte>>();
 
-        // 재사용을 할 수 없다는게 단점 -> 전역 변수로 선언하여 사용
+        // 재사용을 할 수 없다는게 단점 -> 멤버 변수로 선언하여 사용
         SocketAsyncEventArgs _sendArgs = new SocketAsyncEventArgs();
+        SocketAsyncEventArgs _recvArgs = new SocketAsyncEventArgs();
 
         public void Start(Socket socket)
         {
             _socket = socket;
-            SocketAsyncEventArgs recvArgs = new SocketAsyncEventArgs();
-            
+
             // 자동 콜백
-            recvArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnRecvCompleted);
+            _recvArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnRecvCompleted);
             _sendArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnSendCompleted);
 
-            recvArgs.SetBuffer(new byte[1024], 0, 1024);
+            _recvArgs.SetBuffer(new byte[1024], 0, 1024);
 
-            RegisterRecv(recvArgs);
+            RegisterRecv();
         }
 
         // 샌드는 리시브와 다르게 조금 더 복잡할 수 있음
         public void Send(byte[] sendbuff)
         {
-            _sendQueue.Enqueue(sendbuff);
             // 멀티 쓰레드환경이기에 동시에 상호배제, 임계구역을 만들기 위한 lock
             lock (_lock)
             {
-                if (_pending == false) 
+                _sendQueue.Enqueue(sendbuff);
+                if (_pendingList.Count == 0)
                 {
                     RegisterSend();
                 }
@@ -59,16 +60,16 @@ namespace ServerCore
         }
 
         #region 네트워크 통신
+
         void RegisterSend()
         {
-            // SEND()에서 LOCK 처리를 해주어 어짜피 한 명만 들어오기에 별도 LOCK 처리는 필요 없다.
-            _pending = true;
-            byte[] buff = _sendQueue.Dequeue();
+            while (_sendQueue.Count > 0)
+            {
+                byte[] buff = _sendQueue.Dequeue();
+                _pendingList.Add(new ArraySegment<byte>(buff, 0, buff.Length));
+            }
+            _sendArgs.BufferList = _pendingList;
 
-            _sendArgs.SetBuffer(buff, 0, buff.Length);
-
-            // args가 true되어 콜백으로 OnSend를 부르기 전에 Send()에서 lock을 뚫고,
-            // EnQueue 해준 애는 어디선가 누군가가 처리는 해주어야한다.
             bool pending = _socket.SendAsync(_sendArgs);
             if (pending == false)
             {
@@ -85,11 +86,16 @@ namespace ServerCore
                 {
                     try
                     {
+                        _sendArgs.BufferList = null;
+                        _pendingList.Clear();
+
+                        Console.WriteLine($"Transferred bytes : {_sendArgs.BytesTransferred}");
+
                         // queue에 남아있는 항목이 있다면 register에서 다시 뽑아서 사용
                         if (_sendQueue.Count > 0)
                             RegisterSend();
-                        else
-                            _pending = false;
+                        //else
+                        //    _pending = false;
                     }
                     catch (Exception e)
                     {
@@ -104,13 +110,13 @@ namespace ServerCore
         // 다시 들어올 수 있게 pending을 false로 해준다.
 
 
-        void RegisterRecv(SocketAsyncEventArgs args)
+        void RegisterRecv()
         {
             // 비동기
-            bool pending = _socket.ReceiveAsync(args);
+            bool pending = _socket.ReceiveAsync(_recvArgs);
             if (pending == false)
             {
-                OnRecvCompleted(null, args);
+                OnRecvCompleted(null, _recvArgs);
             }
         }
 
@@ -126,7 +132,7 @@ namespace ServerCore
                     // 위에서 설정한 값을 불러올 수 있음
                     string recvDa = Encoding.UTF8.GetString(args.Buffer, args.Offset, args.BytesTransferred);
                     Console.WriteLine($"[From Client: ] {recvDa}");
-                    RegisterRecv(args);
+                    RegisterRecv();
 
                 }
                 catch (Exception e)
