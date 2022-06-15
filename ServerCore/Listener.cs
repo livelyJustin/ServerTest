@@ -5,16 +5,16 @@ using System.Net;
 namespace ServerCore
 {
     // 코드가 커질 경우를 위해 옮겨 주기
-     class Listener
+    class Listener
     {
-
         Socket _listenSocket;
-        Action<Socket> _onAcceptHandler;
+        //Action<Socket> _onAcceptHandler;
+        Func<Session> _sessionFactory;
 
-        public void Init(IPEndPoint endPoint, Action<Socket> onAcceptHandler)
+        public void Init(IPEndPoint endPoint, Func<Session> sessionFactory)
         {
             _listenSocket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            _onAcceptHandler += onAcceptHandler;
+            _sessionFactory += sessionFactory;
 
             // 문지기 교육
             _listenSocket.Bind(endPoint);
@@ -56,10 +56,12 @@ namespace ServerCore
         {
             if (args.SocketError == SocketError.Success)
             {
-                // todo 유저가 들어오면 뭘 해야할지
-                // 콜백 방식으로 다음 행동 동작
-                // client 소켓으로 뱉어준 부분을 이걸로 대신 처리
-                _onAcceptHandler.Invoke(args.AcceptSocket);
+                Session _session = _sessionFactory.Invoke();
+                _session.Start(args.AcceptSocket);
+
+                _session.OnConnected(args.AcceptSocket.RemoteEndPoint);
+
+                //_onAcceptHandler.Invoke(args.AcceptSocket);
             }
             else
                 Console.WriteLine(args.SocketError.ToString()); ;

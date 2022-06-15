@@ -1,10 +1,11 @@
 ﻿using System.Net.Sockets;
+using System.Net;
 using System.Text;
 
 
 namespace ServerCore
 {
-    internal class Session
+    abstract class Session
     {
         Socket _socket;
         int _disconnected = 0;
@@ -19,6 +20,12 @@ namespace ServerCore
         // 재사용을 할 수 없다는게 단점 -> 멤버 변수로 선언하여 사용
         SocketAsyncEventArgs _sendArgs = new SocketAsyncEventArgs();
         SocketAsyncEventArgs _recvArgs = new SocketAsyncEventArgs();
+
+        public abstract void OnConnected(EndPoint end);
+        public abstract void OnRecv(ArraySegment<byte> buffer);
+        public abstract void OnSend(int numOfBytes);
+        public abstract void OnDisconnected(EndPoint end);
+
 
         public void Start(Socket socket)
         {
@@ -55,6 +62,8 @@ namespace ServerCore
             if ((Interlocked.Exchange(ref _disconnected, 1)) == 1)
                 return;
 
+            OnDisconnected(_socket.RemoteEndPoint);
+
             _socket.Shutdown(SocketShutdown.Both);
             _socket.Close();
         }
@@ -70,7 +79,9 @@ namespace ServerCore
             }
             _sendArgs.BufferList = _pendingList;
 
+            // _sendArgs.BufferList여기에 한 번에 처리할 것이 담겨서 아래에서 성공한다면 해당 일감들을 처리한다.
             bool pending = _socket.SendAsync(_sendArgs);
+
             if (pending == false)
             {
                 OnSendCompleted(null, _sendArgs);
@@ -89,7 +100,7 @@ namespace ServerCore
                         _sendArgs.BufferList = null;
                         _pendingList.Clear();
 
-                        Console.WriteLine($"Transferred bytes : {_sendArgs.BytesTransferred}");
+                        OnSend(_sendArgs.BytesTransferred);
 
                         // queue에 남아있는 항목이 있다면 register에서 다시 뽑아서 사용
                         if (_sendQueue.Count > 0)
@@ -126,12 +137,11 @@ namespace ServerCore
             if (args.BytesTransferred > 0 && args.SocketError == SocketError.Success)
             {
                 // todo
-
                 try
                 {
-                    // 위에서 설정한 값을 불러올 수 있음
-                    string recvDa = Encoding.UTF8.GetString(args.Buffer, args.Offset, args.BytesTransferred);
-                    Console.WriteLine($"[From Client: ] {recvDa}");
+                    // 이벤트 연결 필요
+                    OnRecv(new ArraySegment<byte>(args.Buffer, args.Offset, args.BytesTransferred));
+
                     RegisterRecv();
 
                 }
