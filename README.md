@@ -97,3 +97,7 @@ https://velog.io/@livelyjuseok/개인공부-서버실습23-서버-코드-구분-
 2022.06.15
 소켓 프로그래밍 구현 코드 구분 - Session 구분
 https://velog.io/@livelyjuseok/개인공부-서버실습24-서버-코드-구분-비동기-처리5
+
+2022.06.16
+소켓 프로그래밍 구현 코드 구분 - Connector 제작 & 라이브러리화
+https://velog.io/@livelyjuseok/개인공부-서버실습25-Connector
