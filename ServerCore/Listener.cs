@@ -5,7 +5,7 @@ using System.Net;
 namespace ServerCore
 {
     // 코드가 커질 경우를 위해 옮겨 주기
-    class Listener
+    public class Listener
     {
         Socket _listenSocket;
         //Action<Socket> _onAcceptHandler;
