@@ -101,3 +101,7 @@ https://velog.io/@livelyjuseok/개인공부-서버실습24-서버-코드-구분-
 2022.06.16
 Connector 제작 & 라이브러리화
 https://velog.io/@livelyjuseok/개인공부-서버실습25-Connector
+
+2022.06.17
+TCP와 UDP에 대한 공부
+https://velog.io/@livelyjuseok/개인공부-서버실습26-TCP-UDP
