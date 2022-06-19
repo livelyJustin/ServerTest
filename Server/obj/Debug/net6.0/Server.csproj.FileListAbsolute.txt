@@ -13,3 +13,6 @@ C:\Users\JUSTIN\source\repos\Server\Server\obj\Debug\net6.0\refint\Server.dll
 C:\Users\JUSTIN\source\repos\Server\Server\obj\Debug\net6.0\Server.pdb
 C:\Users\JUSTIN\source\repos\Server\Server\obj\Debug\net6.0\Server.genruntimeconfig.cache
 C:\Users\JUSTIN\source\repos\Server\Server\obj\Debug\net6.0\ref\Server.dll
+C:\Users\JUSTIN\source\repos\Server\Server\bin\Debug\net6.0\ServerCore.dll
+C:\Users\JUSTIN\source\repos\Server\Server\bin\Debug\net6.0\ServerCore.pdb
+C:\Users\JUSTIN\source\repos\Server\Server\obj\Debug\net6.0\Server.csproj.CopyComplete
