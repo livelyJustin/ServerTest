@@ -105,3 +105,7 @@ https://velog.io/@livelyjuseok/개인공부-서버실습25-Connector
 2022.06.17
 TCP와 UDP에 대한 공부
 https://velog.io/@livelyjuseok/개인공부-서버실습26-TCP-UDP
+
+2022.06.18
+Receive Buffer 
+https://velog.io/@livelyjuseok/개인공부-서버실습26-RecvBuffer
