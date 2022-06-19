@@ -25,10 +25,12 @@ namespace Server
             Console.WriteLine($"OnDisconnected : {end}");
         }
 
-        public override void OnRecv(ArraySegment<byte> buffer)
+        public override int OnRecv(ArraySegment<byte> buffer)
         {
             string recvDa = Encoding.UTF8.GetString(buffer.Array, buffer.Offset, buffer.Count);
             Console.WriteLine($"[From Server: ] {recvDa}");
+
+            return buffer.Count;
         }
 
         public override void OnSend(int numOfBytes)
