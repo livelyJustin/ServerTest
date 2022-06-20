@@ -1,21 +1,38 @@
-﻿using System.Net;
-using System.Net.Sockets;
+﻿using ServerCore;
+using System.Net;
 using System.Text;
-using ServerCore;
 
 
 namespace Server
 {
+    class Kinght
+    {
+        public int _hp;
+        public int _attack;
+    }
+
     class GameSession : Session
     {
         public override void OnConnected(EndPoint end)
         {
             Console.WriteLine($"OnConnected : {end}");
 
-            byte[] sendBuff = Encoding.UTF8.GetBytes("Welcome to Justin Server"); // 문자열을 바로 보낼 수 있는 타입으로 바꿔준거
-            Send(sendBuff);
+            Kinght kinght = new Kinght() { _hp = 100, _attack = 10 };
+
+
+            ArraySegment<byte> openSegment = SendBufferHelper.Open(4096);
+            
+            byte[] buffer1 = BitConverter.GetBytes(kinght._hp);
+            byte[] buffer2 = BitConverter.GetBytes(kinght._attack);
+            
+            Array.Copy(buffer1, 0, openSegment.Array, openSegment.Offset, buffer1.Length);
+            Array.Copy(buffer2, 0, openSegment.Array, openSegment.Offset+buffer1.Length, buffer2.Length);
+
+            ArraySegment<byte> sendBuffer = SendBufferHelper.Close(buffer1.Length + buffer2.Length);
 
             Thread.Sleep(1000);
+
+            Send(sendBuffer);
 
             Disconnect();
         }
@@ -28,7 +45,7 @@ namespace Server
         public override int OnRecv(ArraySegment<byte> buffer)
         {
             string recvDa = Encoding.UTF8.GetString(buffer.Array, buffer.Offset, buffer.Count);
-            Console.WriteLine($"[From Server: ] {recvDa}");
+            Console.WriteLine($"[From Client ] {recvDa}");
 
             return buffer.Count;
         }

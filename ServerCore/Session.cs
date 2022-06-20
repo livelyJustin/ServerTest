@@ -12,11 +12,10 @@ namespace ServerCore
 
         RecvBuffer _recvBuffer = new RecvBuffer(1024);
 
-
         object _lock = new object();
 
         // 실제로 바로 sendAsyn를 하는게 아나리 담아두었다가 꺼냈다가 할 큐
-        Queue<byte[]> _sendQueue = new Queue<byte[]>();
+        Queue<ArraySegment<byte>> _sendQueue = new Queue<ArraySegment<byte>>();
         //bool _pending = false; // 실행 중일 때는 바로 실행하지 않고, 큐에다가 저장해놓기 위함
         List<ArraySegment<byte>> _pendingList = new List<ArraySegment<byte>>();
 
@@ -44,12 +43,12 @@ namespace ServerCore
         }
 
         // 샌드는 리시브와 다르게 조금 더 복잡할 수 있음
-        public void Send(byte[] sendbuff)
+        public void Send(ArraySegment<byte> sendBuff)
         {
             // 멀티 쓰레드환경이기에 동시에 상호배제, 임계구역을 만들기 위한 lock
             lock (_lock)
             {
-                _sendQueue.Enqueue(sendbuff);
+                _sendQueue.Enqueue(sendBuff);
                 if (_pendingList.Count == 0)
                 {
                     RegisterSend();
@@ -77,8 +76,8 @@ namespace ServerCore
         {
             while (_sendQueue.Count > 0)
             {
-                byte[] buff = _sendQueue.Dequeue();
-                _pendingList.Add(new ArraySegment<byte>(buff, 0, buff.Length));
+                ArraySegment<byte> buff = _sendQueue.Dequeue();
+                _pendingList.Add(buff);
             }
             _sendArgs.BufferList = _pendingList;
 

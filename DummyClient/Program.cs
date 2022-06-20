@@ -16,7 +16,9 @@ namespace DummyClient
                 byte[] sendBuff = Encoding.UTF8.GetBytes($"서버야.. 자니..? {i}");
                 Send(sendBuff);
             }
+
             Thread.Sleep(1000);
+
             Disconnect();
         }
 
@@ -28,14 +30,13 @@ namespace DummyClient
         public override int OnRecv(ArraySegment<byte> buffer)
         {
             string recvDa = Encoding.UTF8.GetString(buffer.Array, buffer.Offset, buffer.Count);
-            Console.WriteLine($"[From Client: ] {recvDa}");
+            Console.WriteLine($"[From Server] {recvDa}");
             return buffer.Count;
         }
 
         public override void OnSend(int numOfBytes)
         {
             Console.WriteLine($"Transferred bytes : {numOfBytes}");
-
         }
     }
     public class Program
