@@ -109,3 +109,7 @@ https://velog.io/@livelyjuseok/개인공부-서버실습26-TCP-UDP
 2022.06.18
 Receive Buffer 
 https://velog.io/@livelyjuseok/개인공부-서버실습26-RecvBuffer
+
+2022.06.18
+Send Buffer 
+https://velog.io/@livelyjuseok/개인공부-서버실습28-SendBuffer
