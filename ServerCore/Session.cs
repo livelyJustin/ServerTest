@@ -1,10 +1,50 @@
-﻿using System.Net.Sockets;
-using System.Net;
-using System.Text;
+﻿using System.Net;
+using System.Net.Sockets;
 
 
 namespace ServerCore
 {
+    public abstract class PacketSession : Session
+    {
+        public static readonly int HeaderSize = 2;
+        // 패킷이 왔다는 건 시작은 size, 두 번 째는 id, 나머지는 내용일 것
+
+        // sealed 다른 Class가 PacketSession을 상속받고, 이 함수를 사용하고자 할 때는 할 수가 없음 봉인임
+        public sealed override int OnRecv(ArraySegment<byte> buffer)
+        {
+            // 내가 원하는 패킷이 다 올 때까지 기다렸다가 처리 할 예정
+            int processLegnth = 0;
+
+            while (true)
+            {
+                // 최소한 헤더는 파싱할 수 있는지 확인( 2 바이트는 받아오는 Size 크기 ) 
+                if (buffer.Count < HeaderSize)
+                    break;
+
+                // 패킷이 완전체로 도착했는지 체크
+                // ushort만큼 긁어줄 예정 
+                ushort datasize = BitConverter.ToUInt16(buffer.Array, buffer.Offset);
+                // 패킷이 다 안왔으면 대기
+                if (buffer.Count < datasize)
+                    break;
+
+                // 위 조건들을 통과했으면 이제 패킷 조립가능 ArraySegment struct 구조이기에 new를 써도 heap에 할당되지 않기에 괜찮다
+                OnRecvPacket(new ArraySegment<byte>(buffer.Array, buffer.Offset, datasize)); // buffer.Slice()도 가능
+
+                processLegnth += datasize;
+
+                // 위에 작업들을 모두 통과했다면 첫 번 째 패킷은 끝난거기에 다음 패킷으로 넘겨버림
+                buffer = new ArraySegment<byte>(buffer.Array, buffer.Offset + datasize, buffer.Count - datasize);
+            }
+
+            return processLegnth;
+        }
+        // sealed한 class 대신에 이걸 받아와 쓰도록 구현
+        public abstract void OnRecvPacket(ArraySegment<byte> buffer);
+
+
+    }
+
     public abstract class Session
     {
         Socket _socket;
@@ -147,22 +187,22 @@ namespace ServerCore
                 try
                 {
                     // write 커서 이동
-                    if(_recvBuffer.OnWrite(args.BytesTransferred) == false )
+                    if (_recvBuffer.OnWrite(args.BytesTransferred) == false)
                     {
                         Disconnect();
                         return;
                     }
 
                     // 콘텐츠 쪽으로 데이터를 넘겨주고 얼마나 처리 했는지 받는다.
-                   int processLen =  OnRecv(_recvBuffer.ReadSegment);
-                    if(processLen < 0 || _recvBuffer.DataSize < processLen)
+                    int processLen = OnRecv(_recvBuffer.ReadSegment);
+                    if (processLen < 0 || _recvBuffer.DataSize < processLen)
                     {
                         Disconnect();
                         return;
                     }
-                        //OnRecv(new ArraySegment<byte>(args.Buffer, args.Offset, args.BytesTransferred));
+                    //OnRecv(new ArraySegment<byte>(args.Buffer, args.Offset, args.BytesTransferred));
 
-                    if(_recvBuffer.OnRead(processLen) == false)
+                    if (_recvBuffer.OnRead(processLen) == false)
                     {
                         Disconnect();
                         return;
