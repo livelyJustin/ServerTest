@@ -117,3 +117,7 @@ https://velog.io/@livelyjuseok/개인공부-서버실습28-SendBuffer
 2022.06.21
 Pakcet Session 구현 
 https://velog.io/@livelyjuseok/개인공부-서버실습29-PacketSession
+
+2022.06.23
+Pakcet Session 구현 (2)
+https://velog.io/@livelyjuseok/개인공부-서버실습30-PacketSession2
