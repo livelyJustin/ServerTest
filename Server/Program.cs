@@ -5,60 +5,6 @@ using System.Text;
 
 namespace Server
 {
-    class Packet
-    {
-        public ushort size;
-        public ushort packetId;
-    }
-
-
-    class GameSession : PacketSession
-    {
-        public override void OnConnected(EndPoint end)
-        {
-            //Console.WriteLine($"OnConnected : {end}");
-
-            //Packet packet = new Packet() { size = 100, packetId = 10 };
-
-
-            //ArraySegment<byte> openSegment = SendBufferHelper.Open(4096);
-
-            //byte[] buffer1 = BitConverter.GetBytes(packet.size);
-            //byte[] buffer2 = BitConverter.GetBytes(packet.packetId);
-
-            //Array.Copy(buffer1, 0, openSegment.Array, openSegment.Offset, buffer1.Length);
-            //Array.Copy(buffer2, 0, openSegment.Array, openSegment.Offset + buffer1.Length, buffer2.Length);
-
-            //ArraySegment<byte> sendBuffer = SendBufferHelper.Close(buffer1.Length + buffer2.Length);
-
-            Thread.Sleep(5000);
-
-            //Send(sendBuffer);
-
-            Disconnect();
-        }
-
-        public override void OnRecvPacket(ArraySegment<byte> buffer)
-        {
-            ushort size = BitConverter.ToUInt16(buffer.Array, buffer.Offset);
-            ushort packetId = BitConverter.ToUInt16(buffer.Array, buffer.Offset + 2);//하드 코딩말고 나중에 자동화할 예정
-
-            Console.WriteLine($"RecvPacktID: {packetId} size:{size} ");
-        }
-
-        public override void OnDisconnected(EndPoint end)
-        {
-            Console.WriteLine($"OnDisconnected : {end}");
-        }
-       
-
-        public override void OnSend(int numOfBytes)
-        {
-            Console.WriteLine($"Transferred bytes : {numOfBytes}");
-
-        }
-    }
-
     class Program
     {
         static Listener _listener = new Listener();
@@ -79,7 +25,7 @@ namespace Server
 
 
             //_listener.Init(endPoint, OnAcceptEventHandler)
-            _listener.Init(endPoint, () => { return new GameSession(); });
+            _listener.Init(endPoint, () => { return new ClientSession(); });
             Console.WriteLine("Listening .... ");
             // 영업을 손님 받을 때 까지 해야하니 무한루프
             while (true)
