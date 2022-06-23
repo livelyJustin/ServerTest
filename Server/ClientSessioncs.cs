@@ -4,24 +4,63 @@ using System.Net;
 namespace Server
 {
     // 패킷 헤더
-    class Packet
+    public abstract class Packet
     {
         public ushort size;
         public ushort packetId;
+
+        // send 생성을 하기 위한 클래스 생성
+        public abstract ArraySegment<byte> Write();
+        public abstract void Read(ArraySegment<byte> s);
     }
 
     // 실제 처럼 하기 위한 class
     class PlayerInforReq : Packet
     {
-        public long playerId;
-    }
+        public long playerId; // 8바이트
 
-    class PlayerInforOk : Packet
-    {
-        public int hp;
-        public int attack;
-    }
+        public PlayerInforReq()
+        {
+            this.packetId = (ushort)PacketID.PlayerInforReq;
+        }
 
+        public override void Read(ArraySegment<byte> s)
+        {
+            ushort count = 0;
+            //ushort size = BitConverter.ToUInt16(s.Array, s.Offset);
+            count += 2;
+            // ID는 추출할 필요가 없음 이미 Switch 문에서 걸렸다면 해당 아이디 이기 때매
+            //ushort packetId = BitConverter.ToUInt16(s.Array, s.Offset + count);//하드 코딩말고 나중에 자동화할 예정
+            count += 2;
+            this.playerId = BitConverter.ToInt64(new ReadOnlySpan<byte>(s.Array, s.Offset + count, s.Count - count));
+
+            count += 8;
+        }
+
+        public override ArraySegment<byte> Write()
+        {
+            ArraySegment<byte> openSeg = SendBufferHelper.Open(4096);
+
+            bool success = true;
+            ushort count = 0;
+
+            count += 2;
+            // this로 변경
+            success &= BitConverter.TryWriteBytes(new Span<byte>(openSeg.Array, openSeg.Offset + count, openSeg.Count - count), this.packetId);
+            count += 2;
+            success &= BitConverter.TryWriteBytes(new Span<byte>(openSeg.Array, openSeg.Offset + count, openSeg.Count - count), this.playerId);
+            count += 8;
+            success &= BitConverter.TryWriteBytes(new Span<byte>(openSeg.Array, openSeg.Offset, openSeg.Count), count);
+
+            // 성공 여부가 null 인지 아닌지로 알 수 있음
+            if (success == false)
+                return null;
+
+            // 리턴 값 설정
+            return SendBufferHelper.Close(count);
+        }
+
+    }
     public enum PacketID
     {
         PlayerInforReq = 1,
@@ -66,14 +105,12 @@ namespace Server
             {
                 case PacketID.PlayerInforReq:
                     {
-                        // long은 8바이트 크기의 변수이기에 64비트로
-                        long playerId = BitConverter.ToInt64(buffer.Array, buffer.Offset + count) ;
-                        count += 8;
-                        Console.WriteLine($"PlayerInforReq: {playerId}");
+                        PlayerInforReq playerinfoReq = new PlayerInforReq();
+                        playerinfoReq.Read(buffer);
+                        Console.WriteLine($"PlayerInforReq: {playerinfoReq.playerId}");
                     }
                     break;
             }
-
             Console.WriteLine($"RecvPacktID: {packetId} size:{size}");
         }
 
