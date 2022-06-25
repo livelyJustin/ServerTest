@@ -131,5 +131,8 @@ https://velog.io/@livelyjuseok/개인공부-서버실습30-PacketSession2
 Pakcet Session 구현 (3)
 https://velog.io/@livelyjuseok/개인공부-서버실습31-PacketSession3
 
+2022.06.25
+UTF-8의 
+https://velog.io/@livelyjuseok/개인공부-서버실습32-UTF-8-Encording
 
 </details>
