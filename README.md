@@ -132,7 +132,10 @@ Pakcet Session 구현 (3)
 https://velog.io/@livelyjuseok/개인공부-서버실습31-PacketSession3
 
 2022.06.25
-UTF-8의 
+UTF-8에 대한 이해
 https://velog.io/@livelyjuseok/개인공부-서버실습32-UTF-8-Encording
 
+2022.06.27
+packetsession(4) - string 문자열 넘기기
+https://velog.io/@livelyjuseok/packetsession4
 </details>
