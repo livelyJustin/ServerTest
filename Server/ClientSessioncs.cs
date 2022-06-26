@@ -19,7 +19,7 @@ namespace Server
     class PlayerInforReq : Packet
     {
         public long playerId; // 8바이트
-        public string name;
+        public string name; // string 뿐만 아니라 아이콘과 같은 byte 배열도 넘기는 방법을 이해한 것이다.(두 단계로 보낸방법)
 
         public PlayerInforReq()
         {
@@ -31,19 +31,12 @@ namespace Server
         public override void Read(ArraySegment<byte> segment)
         {
             ushort count = 0;
-            //ushort size = BitConverter.ToUInt16(s.Array, s.Offset);
 
             ReadOnlySpan<byte> readSpan = new ReadOnlySpan<byte>(segment.Array, segment.Offset, segment.Count);
+
             count += sizeof(ushort);
-            // ID는 추출할 필요가 없음 이미 Switch 문에서 걸렸다면 해당 아이디 이기 때매
-            //ushort packetId = BitConverter.ToUInt16(s.Array, s.Offset + count);//하드 코딩말고 나중에 자동화할 예정
             count += sizeof(ushort);
 
-            // 클라에서 보낸 정보를 무조건 Read 하는 것이 아니라, 크기가 정확한지 다시 한 번 체크한다.
-            // 코드의 안정성을 위해 패킷의 사이즈를 한 번 더 체크해야함 ReadOnlySpan을 받는 값으로 변경해주어 체크 
-
-            // s.count는 Write에서 count로 보낸 값. 즉, 12이다. 그렇기에 위에서 size, packetId를 추출하며 사용한 바이트 값을 제외하고
-            // 남은 값의 크기가 일치하는 지 확인하는 것이다. 범위를 초과할 경우 에러가 날 것이다. 
             this.playerId = BitConverter.ToInt64(readSpan.Slice(count, readSpan.Length - count));
             count += sizeof(long);
 
@@ -61,34 +54,52 @@ namespace Server
             bool success = true;
             ushort count = 0;
 
-            Span<byte> span = new Span<byte>(openSeg.Array, openSeg.Offset, openSeg.Count);
 
 
 
             // 하드 코딩 식이 아닌 더 깔끔한 표현을 위해 ushort의 사이즈를 올려준다.
-            count += sizeof(ushort);
             // this로 변경
+
             //success &= BitConverter.TryWriteBytes(new Span<byte>(openSeg.Array, openSeg.Offset + count, openSeg.Count - count), this.packetId);
+
+
             // slice() => 시작 offest과 길이를 넘겨주어 해당 부분을 잘라서 넘겨준다. -> 가독성 증가
-            // slice는 결과가 변경 되는게 아닌 그 일부를 복사해 넘겨준다고 보면된다.
+            // slice는 원본이 변경 되는게 아닌 그 일부를 복사해 넘겨준다.
+
+            Span<byte> span = new Span<byte>(openSeg.Array, openSeg.Offset, openSeg.Count);
+
+            count += sizeof(ushort);
             success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), this.packetId);
 
             count += sizeof(ushort);
             success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), this.playerId);
+
             count += sizeof(long);
 
             // string을 보냐기 위한 두 단계
 
             //this.name.Length; => 길이는 4이나 8바이트가 나옴 
             // utf-16으로 넘겨주는법 이렇게해야 4바이트가 넘어감
-            ushort nameLen = (ushort)Encoding.Unicode.GetByteCount(this.name);
-            success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), nameLen);
-            count += sizeof(ushort);
-            //Encoding.Unicode.GetBytes(this.name);   // string을 바이트 배열로 넘겨줄 수 있다.
-            Array.Copy(Encoding.Unicode.GetBytes(this.name), 0, openSeg.Array, count, nameLen);
-            count += nameLen;
 
+            //ushort nameLen = (ushort)Encoding.Unicode.GetByteCount(this.name);
+            //success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), nameLen);
+
+            //count += sizeof(ushort);
+            //Array.Copy(Encoding.Unicode.GetBytes(this.name), 0, openSeg.Array, count, nameLen);
+
+            // Array.Copy 시에는 getbytes로 내부적으로는 new를 하고 뱉어주고 있기에 상태이기에 위와 통일감 또는 효율적이게 작용하기 위해 사용함
+
+            // 이렇게하면 openSeg 배열의 offset+count 위치에 this.name 인코딩 값이 들어감
+            // 그거에 대한 총 길이가 ushort 타입으로 캐스팅하여 담아둠
+
+            ushort nameLen = (ushort)Encoding.Unicode.GetBytes(this.name, 0, this.name.Length, openSeg.Array, openSeg.Offset + count + sizeof(ushort));
+
+            success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), nameLen);
+
+            count += nameLen;
+            count += sizeof(ushort);
             success &= BitConverter.TryWriteBytes(span, count); // 원본을 넣으면 된다.
+
 
             // 성공 여부가 null 인지 아닌지로 알 수 있음
             if (success == false)
@@ -98,6 +109,7 @@ namespace Server
             return SendBufferHelper.Close(count);
         }
     }
+
     public enum PacketID
     {
         PlayerInforReq = 1,
