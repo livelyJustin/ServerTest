@@ -138,4 +138,8 @@ https://velog.io/@livelyjuseok/개인공부-서버실습32-UTF-8-Encording
 2022.06.27
 packetsession(4) - string 문자열 넘기기
 https://velog.io/@livelyjuseok/packetsession4
+
+2022.06.28
+packetsession(4) - string 문자열 넘기기
+https://velog.io/@livelyjuseok/개인공부-서버실습34-List-Packet
 </details>
