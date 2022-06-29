@@ -4,28 +4,13 @@ using System.Text;
 
 namespace DummyClient
 {
-    // 패킷 헤더
-    public abstract class Packet
-    {
-        public ushort siez;
-        public ushort packetId;
-
-        public abstract ArraySegment<byte> Write();
-        public abstract void Read(ArraySegment<byte> s);
-    }
-
-
-    class PlayerInforReq : Packet
+    class PlayerInforReq
     {
         public long playerId; // 8바이트
         public string name; // string 뿐만 아니라 아이콘과 같은 byte 배열도 넘기는 방법을 이해한 것이다.(두 단계로 보낸방법)
 
         public List<SkillInfo> skills = new List<SkillInfo>();
 
-        public PlayerInforReq()
-        {
-            this.packetId = (ushort)PacketID.PlayerInforReq;
-        }
 
         public struct SkillInfo
         {
@@ -63,8 +48,8 @@ namespace DummyClient
 
 
         // wrtie는 직접 컨트롤하고 있기에 문제가 없지만 
-        // read는 문제가 생길 수 있음 -> 서버는 항상 클라이언트 쪽에서 잘못된 정보를 보낼 수 있다고 가정하고 해야함
-        public override void Read(ArraySegment<byte> segment)
+        // read는  생길 수 있음 -> 서버는 항상 클라이언트 쪽에서 잘못된 정보를 보낼 수 있다고 가정하고 해야함
+        public void Read(ArraySegment<byte> segment)
         {
             ushort count = 0;
 
@@ -96,7 +81,7 @@ namespace DummyClient
 
         }
 
-        public override ArraySegment<byte> Write()
+        public ArraySegment<byte> Write()
         {
             ArraySegment<byte> openSeg = SendBufferHelper.Open(4096);
 
@@ -107,11 +92,10 @@ namespace DummyClient
 
 
             count += sizeof(ushort);
-            success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), this.packetId);
+            success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), (ushort)PacketID.PlayerInforReq);
 
             count += sizeof(ushort);
             success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), this.playerId);
-
             count += sizeof(long);
 
             // string
