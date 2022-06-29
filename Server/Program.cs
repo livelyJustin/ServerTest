@@ -1,45 +1,10 @@
-﻿using System.Net;
-using System.Net.Sockets;
+﻿using ServerCore;
+using System.Net;
 using System.Text;
-using ServerCore;
 
 
 namespace Server
 {
-    class GameSession : Session
-    {
-        public override void OnConnected(EndPoint end)
-        {
-            Console.WriteLine($"OnConnected : {end}");
-
-            byte[] sendBuff = Encoding.UTF8.GetBytes("Welcome to Justin Server"); // 문자열을 바로 보낼 수 있는 타입으로 바꿔준거
-            Send(sendBuff);
-
-            Thread.Sleep(1000);
-
-            Disconnect();
-        }
-
-        public override void OnDisconnected(EndPoint end)
-        {
-            Console.WriteLine($"OnDisconnected : {end}");
-        }
-
-        public override int OnRecv(ArraySegment<byte> buffer)
-        {
-            string recvDa = Encoding.UTF8.GetString(buffer.Array, buffer.Offset, buffer.Count);
-            Console.WriteLine($"[From Server: ] {recvDa}");
-
-            return buffer.Count;
-        }
-
-        public override void OnSend(int numOfBytes)
-        {
-            Console.WriteLine($"Transferred bytes : {numOfBytes}");
-
-        }
-    }
-
     class Program
     {
         static Listener _listener = new Listener();
@@ -60,7 +25,7 @@ namespace Server
 
 
             //_listener.Init(endPoint, OnAcceptEventHandler)
-            _listener.Init(endPoint, () => { return new GameSession(); });
+            _listener.Init(endPoint, () => { return new ClientSession(); });
             Console.WriteLine("Listening .... ");
             // 영업을 손님 받을 때 까지 해야하니 무한루프
             while (true)
