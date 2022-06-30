@@ -46,7 +46,6 @@ namespace DummyClient
             }
         }
 
-
         // wrtie는 직접 컨트롤하고 있기에 문제가 없지만 
         // read는  생길 수 있음 -> 서버는 항상 클라이언트 쪽에서 잘못된 정보를 보낼 수 있다고 가정하고 해야함
         public void Read(ArraySegment<byte> segment)
@@ -78,7 +77,6 @@ namespace DummyClient
                 skill.Read(readSpan, ref count);
                 skills.Add(skill);
             }
-
         }
 
         public ArraySegment<byte> Write()
@@ -115,8 +113,6 @@ namespace DummyClient
 
             success &= BitConverter.TryWriteBytes(span, count); // 원본을 넣으면 된다.
 
-
-
             // 성공 여부가 null 인지 아닌지로 알 수 있음
             if (success == false)
                 return null;
@@ -125,7 +121,6 @@ namespace DummyClient
             return SendBufferHelper.Close(count);
         }
     }
-
 
     public enum PacketID
     {
@@ -146,7 +141,6 @@ namespace DummyClient
             packet.skills.Add(new PlayerInforReq.SkillInfo() { id = 222, level = 20, duration = 4f });
             packet.skills.Add(new PlayerInforReq.SkillInfo() { id = 333, level = 30, duration = 5f });
             packet.skills.Add(new PlayerInforReq.SkillInfo() { id = 444, level = 40, duration = 6f });
-
             {
                 // write() 함수에서 버퍼 크기 할당, 작업까지 다 해줌 
                 // 다른 곳에서도 패킷을 보낼 때는 packet 클래스를 인스턴스하여 사용해도 됨

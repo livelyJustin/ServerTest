@@ -12,7 +12,6 @@ namespace Server
 
         public List<SkillInfo> skills = new List<SkillInfo>();
 
-
         public struct SkillInfo 
         {
             public int id;
@@ -47,7 +46,6 @@ namespace Server
             }
         }
 
-
         // wrtie는 직접 컨트롤하고 있기에 문제가 없지만 
         // read는 문제가 생길 수 있음 -> 서버는 항상 클라이언트 쪽에서 잘못된 정보를 보낼 수 있다고 가정하고 해야함
         public void Read(ArraySegment<byte> segment)
@@ -79,7 +77,6 @@ namespace Server
                 skill.Read(readSpan, ref count);
                 skills.Add(skill);
             }
-
         }
 
         public ArraySegment<byte> Write()
@@ -92,7 +89,7 @@ namespace Server
             Span<byte> span = new Span<byte>(openSeg.Array, openSeg.Offset, openSeg.Count);
 
             count += sizeof(ushort);
-            success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), this.packetId);
+            success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), this.packetId); // 여기는 나중에 변경해줄 예정 패킷 아이디가 아닌 뭔가 다른걸로
 
             count += sizeof(ushort);
             success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), this.playerId);

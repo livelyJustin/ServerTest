@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace PacketGenerator
 {
+    // 공통적으로 사용되는 요소들과, 유동적으로 변하는 요소들을 구분하여 처리할 에정
+    // 예를들어 class의 기존 PlayerInfoReq 였지만, 다른 곳에서는 class 이름이 다른 곳에서는 다른 이름일 수 있기에 {0} 이라는 걸로 대체하여
+    // 나중에이 {0}에 이름을 넘겨줄 수 있도록 한다.
     class PacketFormat
     {
         //{0} 패킷이름: 항상 PlaerInforReq은 아니기에 유동적임
