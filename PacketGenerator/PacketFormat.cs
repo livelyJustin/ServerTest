@@ -20,52 +20,12 @@ namespace PacketGenerator
 class {0}
 {{
     {1}
-    public long playerId; // 8바이트
-    public string name; // string 뿐만 아니라 아이콘과 같은 byte 배열도 넘기는 방법을 이해한 것이다.(두 단계로 보낸방법)
-
-    public List<SkillInfo> skills = new List<SkillInfo>();
-
-
-    public struct SkillInfo
-    {{
-        public int id;
-        public short level;
-        public float duration;
-
-        public bool Write(Span<byte> span, ref ushort count)
-        {{
-            bool success = true;
-
-            success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), id);
-            count += sizeof(int);
-
-            success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), level);
-            count += sizeof(short);
-
-            success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), duration);
-            count += sizeof(float);
-            return success;
-        }}
-
-        public void Read(ReadOnlySpan<byte> readSpan, ref ushort count)
-        {{
-            id = BitConverter.ToInt32(readSpan.Slice(count, readSpan.Length - count));
-            count += sizeof(int);
-
-            level = BitConverter.ToInt16(readSpan.Slice(count, readSpan.Length - count));
-            count += sizeof(short);
-
-            duration = BitConverter.ToSingle(readSpan.Slice(count, readSpan.Length - count));
-            count += sizeof(float);
-        }}
-    }}
-
+   
     public void Read(ArraySegment<byte> segment)
     {{
         ushort count = 0;
 
         ReadOnlySpan<byte> readSpan = new ReadOnlySpan<byte>(segment.Array, segment.Offset, segment.Count);
-
         count += sizeof(ushort);
         count += sizeof(ushort);
         {2}
@@ -76,14 +36,16 @@ class {0}
         ArraySegment<byte> openSeg = SendBufferHelper.Open(4096);
         bool success = true;
         ushort count = 0;
+
         Span<byte> span = new Span<byte>(openSeg.Array, openSeg.Offset, openSeg.Count);
+
         count += sizeof(ushort);
         success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), (ushort)PacketID.{0});
+        count += sizeof(ushort);
         {3}
-        success &= BitConverter.TryWriteBytes(span, count); // 원본을 넣으면 된다.
+        success &= BitConverter.TryWriteBytes(span, count);
         if (success == false)
             return null;
-        // 리턴 값 설정
         return SendBufferHelper.Close(count);
     }}
 }}
@@ -91,23 +53,58 @@ class {0}
         // {0} 변수 형식
         // {1} 변수 이름
         public static string memberFormat = 
-@"public {0} {1}";
+@"public {0} {1};";
+        // {0} 리스트 이름 [대문자]
+        // {1} 리스트 이름 [소문자]
+        // {2} 멤버변수: playerId, name은 다다르기에
+        // {3} 멤버변수 read
+        // {4} 멤버변수 write
+        public static string memberListFormat =
+@"public struct {0}
+{{
+    {2}
+
+    public void Read(ReadOnlySpan<byte> readSpan, ref ushort count)
+    {{
+        {3}
+    }}
+
+    public bool Write(Span<byte> span, ref ushort count)
+    {{
+        bool success = true;
+        {4}
+        return success;
+    }}
+}}
+public List<{0}> {1}s = new List<{0}>();";
 
         // {0} 변수 이름(기존은id)
         // {1} To ~ 변수 형식 (기존 ToInt32)
         // {2} sizeof ~ 변수 형식 (기존 int or something)
         public static string readFormat =
-@" this.{0} = BitConverter.{1}(readSpan.Slice(count, readSpan.Length - count));
+@"this.{0} = BitConverter.{1}(readSpan.Slice(count, readSpan.Length - count));
 count += sizeof({2});";
 
         // {0} 변수 이름 여기서 toint, ushort, getstring은 고정
         public static string readStringFormat =
 @" ushort {0}Len = BitConverter.ToUInt16(readSpan.Slice(count, readSpan.Length - count));
 count += sizeof(ushort);
-
 this.{0} = Encoding.Unicode.GetString(readSpan.Slice(count, {0}Len)); 
 count += {0}Len;";
 
+        // {0} 리스트 이름 [대문자]
+        // {1} 리스트 이름 [소문자]
+        public static string readListFormat =
+@"this.{1}s.Clear();
+ushort {1}Leng = BitConverter.ToUInt16(readSpan.Slice(count, readSpan.Length - count));
+count += sizeof(ushort);
+for (int i = 0; i < {1}Leng; i++)
+{{
+    {0} {1} = new {0}();
+    {1}.Read(readSpan, ref count);
+    {1}s.Add({1});
+}}
+";
         // {0} 변수 이름 (기존 playerId)
         // {1} 변수 형식 (기존 long)
         public static string writeFormat =
@@ -120,5 +117,14 @@ count += sizeof({1});";
 success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), {0}Len);
 count += sizeof(ushort);
 count += {0}Len;";
+        // {0} 리스트 이름 [대문자]
+        // {1} 리스트 이름 [소문자]
+        public static string writeListFormat =
+    @"success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), (ushort)this.{1}s.Count);
+count += sizeof(ushort);
+foreach ({0} {1} in {1}s)
+    success &= {1}.Write(span, ref count);
+";
     }
+
 }
