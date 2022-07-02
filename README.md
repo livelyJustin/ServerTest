@@ -144,6 +144,10 @@ packetsession(5) - list로 구조체 넘기기
 https://velog.io/@livelyjuseok/개인공부-서버실습34-List-Packet
 
 2022.07.01
-packetsession(5) - list로 구조체 넘기기
+Packet Generator(1)
 https://velog.io/@livelyjuseok/개인공부-서버실습35-Packet-Generator
+
+2022.07.01
+Packet Generator(2)
+https://velog.io/@livelyjuseok/개인공부-서버실습36-Packet-Generator2
 </details>
