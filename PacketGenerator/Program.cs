@@ -11,6 +11,8 @@ namespace PacketGenerator
 
         static void Main(string[] args)
         {
+            string pdlPath = "../../PDL.xml";
+
             XmlReaderSettings settings = new XmlReaderSettings()
             {
                 // 주석 무시
@@ -19,9 +21,12 @@ namespace PacketGenerator
                 IgnoreWhitespace = true,
             };
 
+            if (args.Length >= 1)
+                pdlPath = args[0];
+
             // XML 을 생성하고 파싱 한 뒤에는 다시 닫아줘야 한다.
             // 이때 using을 사용한다면 해당 영역에서 벗어날 때 Dispose를 진행
-            using (XmlReader x = XmlReader.Create("PDL.xml", settings))
+            using (XmlReader x = XmlReader.Create(pdlPath, settings))
             {
                 // 버전 정보같은 헤더 영역은 건너 뛴다.
                 x.MoveToContent();
