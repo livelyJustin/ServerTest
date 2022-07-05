@@ -50,6 +50,7 @@ class {0}
         ReadOnlySpan<byte> readSpan = new ReadOnlySpan<byte>(segment.Array, segment.Offset, segment.Count);
         count += sizeof(ushort);
         count += sizeof(ushort);
+
         {2}
     }}
 
