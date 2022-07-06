@@ -11,8 +11,15 @@ public enum PacketID
 	
 }
 
+interface IPacket
+{
+	ushort Protocol { get ; }
+	void Read(ArraySegment<byte> segment);
+	ArraySegment<byte> Write();
+}
 
-class PlayerInforReq
+
+class PlayerInforReq : IPacket
 {
     public byte testByte;
 	public long playerId;
@@ -80,6 +87,8 @@ class PlayerInforReq
 	    }
 	}
 	public List<Skill> skills = new List<Skill>();
+
+    public ushort Protocol { get { return (ushort)PacketID.PlayerInforReq; } }
    
     public void Read(ArraySegment<byte> segment)
     {
@@ -88,6 +97,7 @@ class PlayerInforReq
         ReadOnlySpan<byte> readSpan = new ReadOnlySpan<byte>(segment.Array, segment.Offset, segment.Count);
         count += sizeof(ushort);
         count += sizeof(ushort);
+
         this.testByte = (byte)segment.Array[segment.Offset + count];
 		count += sizeof(byte);
 		this.playerId = BitConverter.ToInt64(readSpan.Slice(count, readSpan.Length - count));
@@ -119,7 +129,7 @@ class PlayerInforReq
         count += sizeof(ushort);
         success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), (ushort)PacketID.PlayerInforReq);
         count += sizeof(ushort);
-        segment.Array[segment.Offset + count] = (byte)this.testByte;
+        openSeg.Array[openSeg.Offset + count] = (byte)this.testByte;
 		count += sizeof(byte);
 		success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), this.playerId);
 		count += sizeof(long);
@@ -139,9 +149,11 @@ class PlayerInforReq
     }
 }
 
-class test
+class test : IPacket
 {
     public int testint;
+
+    public ushort Protocol { get { return (ushort)PacketID.test; } }
    
     public void Read(ArraySegment<byte> segment)
     {
@@ -150,6 +162,7 @@ class test
         ReadOnlySpan<byte> readSpan = new ReadOnlySpan<byte>(segment.Array, segment.Offset, segment.Count);
         count += sizeof(ushort);
         count += sizeof(ushort);
+
         this.testint = BitConverter.ToInt32(readSpan.Slice(count, readSpan.Length - count));
 		count += sizeof(int);
     }

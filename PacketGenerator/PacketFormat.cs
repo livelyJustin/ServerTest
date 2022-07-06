@@ -26,6 +26,13 @@ public enum PacketID
     {0}
 }}
 
+interface IPacket
+{{
+	ushort Protocol {{ get; }}
+	void Read(ArraySegment<byte> segment);
+	ArraySegment<byte> Write();
+}}
+
 {1}
 ";
         // {0} 패킷 이름
@@ -39,9 +46,11 @@ public enum PacketID
         //{3} 멤버변수 write
         public static string packetFormat =
 @"
-class {0}
+class {0} : IPacket
 {{
     {1}
+
+    public ushort Protocol {{ get {{ return (ushort)PacketID.{0}; }} }}
    
     public void Read(ArraySegment<byte> segment)
     {{
@@ -143,7 +152,7 @@ count += sizeof({1});";
         // {0} 변수 이름
         // {1} 변수 형식 -> sByte도 사용할 수 있기에
         public static string writeByteFormat =
-@"segment.Array[segment.Offset + count] = (byte)this.{0};
+@"openSeg.Array[openSeg.Offset + count] = (byte)this.{0};
 count += sizeof({1});";
 
         // {0} 변수 이름 

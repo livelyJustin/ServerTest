@@ -11,6 +11,7 @@ namespace Server
 
         static void Main(string[] args)
         {
+            PacketManager.instance.Register(); // Register가 멀티 쓰레드 오류에서 벗어나기 위한 선언
             // DNS (Domain Name System) 
             // 하드 코딩으로 IP를 등록해두면 나중에 교체 등의 문제가 생길 수 있어 도메인으로 등록
 
