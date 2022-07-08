@@ -164,4 +164,10 @@ https://velog.io/@livelyjuseok/개인공부-서버실습38-Packet-Generator4
 2022.07.06
 Packet Generator(5)
 https://velog.io/@livelyjuseok/개인공부-서버실습39-Packet-Generator5
+
+2022.07.07 -> 휴식
+
+2022.07.08
+Packet Generator(6)
+https://velog.io/@livelyjuseok/개인공부-서버실습40-Packet-Generator6
 </details>
