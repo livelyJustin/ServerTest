@@ -11,7 +11,67 @@ namespace PacketGenerator
     // 나중에이 {0}에 이름을 넘겨줄 수 있도록 한다.
     class PacketFormat
     {
+        // {0} Register 부분
+        public static string managerFormat =
+@"using System;
+using System.Collections.Generic;
+using ServerCore;
 
+class PacketManager
+{{
+    #region Singleton
+    static PacketManager _instance;
+    public static PacketManager instance
+    {{
+        get
+        {{
+            if (_instance == null)
+                _instance = new PacketManager();
+            return _instance;
+        }}
+    }}
+    #endregion Singleton
+
+    Dictionary<ushort, Action<PacketSession, ArraySegment<byte>>> _onRecv =
+        new Dictionary<ushort, Action<PacketSession, ArraySegment<byte>>>();
+    Dictionary<ushort, Action<PacketSession, IPacket>> _handler 
+        = new Dictionary<ushort, Action<PacketSession, IPacket>>();
+
+    public void Register()
+    {{
+{0}
+    }}
+
+    public void OnRecvPacket(PacketSession session, ArraySegment<byte> buffer)
+    {{
+        ushort count = 0;
+        ushort size = BitConverter.ToUInt16(buffer.Array, buffer.Offset);
+        count += (ushort)sizeof(ushort);
+
+        ushort packetId = BitConverter.ToUInt16(buffer.Array, buffer.Offset + count);
+        count += (ushort)sizeof(ushort);
+
+        Action<PacketSession, ArraySegment<byte>> action = null;
+        if (_onRecv.TryGetValue(packetId, out action))
+            action.Invoke(session, buffer);
+    }}
+    
+    void MakePacket<T>(PacketSession session, ArraySegment<byte> buffer) where T : IPacket, new()
+    {{
+        T pkt = new T();
+        pkt.Read(buffer);
+
+        Action<PacketSession, IPacket> action = null ;
+        // 
+        if(_handler.TryGetValue(pkt.Protocol, out action))
+            action.Invoke(session, pkt);
+    }}
+}}
+";
+        // {0} 패킷아이디
+        public static string managerRegisterFormat =
+@"      _onRecv.Add((ushort)PacketID.{0}, MakePacket<{0}>);
+       _handler.Add((ushort)PacketID.{0}, PacketHandler.{0}Handler);";
         // {0} 패킷 이름과 번호 목록
         // {1} 패킷 목록
         public static string fileFormat =

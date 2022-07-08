@@ -6,7 +6,9 @@ namespace PacketGenerator
     {
         static string genPackets;
         static ushort packetId; // emum을 처리하기 위해서는 몇개의 packet을 처리했는지 체크하기 위한 변수
-        static string packetEnums; 
+        static string packetEnums;
+        static string serverRegister;
+        static string clientRegister;
 
 
         static void Main(string[] args)
@@ -41,6 +43,10 @@ namespace PacketGenerator
 
                 string fileText = string.Format(PacketFormat.fileFormat, packetEnums, genPackets);
                 File.WriteAllText("GenPackets.cs", fileText);
+                string clientManagerText = string.Format(PacketFormat.managerFormat, clientRegister);
+                File.WriteAllText("ClientPacketManager.cs", clientManagerText);
+                string serverManagerText = string.Format(PacketFormat.managerFormat, serverRegister);
+                File.WriteAllText("ServerPacketManager.cs", serverManagerText);
             }
         }
 
@@ -69,6 +75,11 @@ namespace PacketGenerator
             Tuple<string, string, string> t = ParseMembers(x);
             genPackets += string.Format(PacketFormat.packetFormat, packetName, t.Item1, t.Item2, t.Item3);
             packetEnums += string.Format(PacketFormat.packetEnumFormat, packetName, ++packetId) + Environment.NewLine + "\t";
+            if (packetName.StartsWith("S_") || packetName.StartsWith("s_"))
+                clientRegister += string.Format(PacketFormat.managerRegisterFormat, packetName) + Environment.NewLine;
+            else if (packetName.StartsWith("C_") || packetName.StartsWith("c_"))
+                serverRegister += string.Format(PacketFormat.managerRegisterFormat, packetName) + Environment.NewLine;
+
         }
         // Packet의 내부 애들 동작시키기
         public static Tuple<string, string, string> ParseMembers(XmlReader x)
