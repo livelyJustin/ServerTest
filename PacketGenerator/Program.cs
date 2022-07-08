@@ -6,11 +6,15 @@ namespace PacketGenerator
     {
         static string genPackets;
         static ushort packetId; // emum을 처리하기 위해서는 몇개의 packet을 처리했는지 체크하기 위한 변수
-        static string packetEnums; 
+        static string packetEnums;
+        static string serverRegister;
+        static string clientRegister;
 
 
         static void Main(string[] args)
         {
+            string pdlPath = "../../PDL.xml";
+
             XmlReaderSettings settings = new XmlReaderSettings()
             {
                 // 주석 무시
@@ -19,9 +23,12 @@ namespace PacketGenerator
                 IgnoreWhitespace = true,
             };
 
+            if (args.Length >= 1)
+                pdlPath = args[0];
+
             // XML 을 생성하고 파싱 한 뒤에는 다시 닫아줘야 한다.
             // 이때 using을 사용한다면 해당 영역에서 벗어날 때 Dispose를 진행
-            using (XmlReader x = XmlReader.Create("PDL.xml", settings))
+            using (XmlReader x = XmlReader.Create(pdlPath, settings))
             {
                 // 버전 정보같은 헤더 영역은 건너 뛴다.
                 x.MoveToContent();
@@ -36,6 +43,10 @@ namespace PacketGenerator
 
                 string fileText = string.Format(PacketFormat.fileFormat, packetEnums, genPackets);
                 File.WriteAllText("GenPackets.cs", fileText);
+                string clientManagerText = string.Format(PacketFormat.managerFormat, clientRegister);
+                File.WriteAllText("ClientPacketManager.cs", clientManagerText);
+                string serverManagerText = string.Format(PacketFormat.managerFormat, serverRegister);
+                File.WriteAllText("ServerPacketManager.cs", serverManagerText);
             }
         }
 
@@ -64,6 +75,11 @@ namespace PacketGenerator
             Tuple<string, string, string> t = ParseMembers(x);
             genPackets += string.Format(PacketFormat.packetFormat, packetName, t.Item1, t.Item2, t.Item3);
             packetEnums += string.Format(PacketFormat.packetEnumFormat, packetName, ++packetId) + Environment.NewLine + "\t";
+            if (packetName.StartsWith("S_") || packetName.StartsWith("s_"))
+                clientRegister += string.Format(PacketFormat.managerRegisterFormat, packetName) + Environment.NewLine;
+            else if (packetName.StartsWith("C_") || packetName.StartsWith("c_"))
+                serverRegister += string.Format(PacketFormat.managerRegisterFormat, packetName) + Environment.NewLine;
+
         }
         // Packet의 내부 애들 동작시키기
         public static Tuple<string, string, string> ParseMembers(XmlReader x)
