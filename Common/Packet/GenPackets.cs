@@ -152,6 +152,7 @@ class C_PlayerInforReq : IPacket
 class S_test : IPacket
 {
     public int testint;
+	public long testlong;
 
     public ushort Protocol { get { return (ushort)PacketID.S_test; } }
    
@@ -165,6 +166,8 @@ class S_test : IPacket
 
         this.testint = BitConverter.ToInt32(readSpan.Slice(count, readSpan.Length - count));
 		count += sizeof(int);
+		this.testlong = BitConverter.ToInt64(readSpan.Slice(count, readSpan.Length - count));
+		count += sizeof(long);
     }
 
     public ArraySegment<byte> Write()
@@ -180,6 +183,8 @@ class S_test : IPacket
         count += sizeof(ushort);
         success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), this.testint);
 		count += sizeof(int);
+		success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), this.testlong);
+		count += sizeof(long);
         success &= BitConverter.TryWriteBytes(span, count);
         if (success == false)
             return null;
