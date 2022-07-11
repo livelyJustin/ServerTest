@@ -3,7 +3,7 @@
 
 class PacketHandler
 {
-    public static void C_PlayerInforReqHandler(PacketSession session, IPacket packet)
+    public static void C_ChatHandler(PacketSession session, IPacket packet)
     {
         C_PlayerInforReq p = packet as C_PlayerInforReq;
         Console.WriteLine($"PlayerInforReq: {p.playerId} playernanme: {p.name}");

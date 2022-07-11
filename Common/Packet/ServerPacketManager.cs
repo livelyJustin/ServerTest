@@ -24,8 +24,8 @@ class PacketManager
 
     public void Register()
     {
-      _onRecv.Add((ushort)PacketID.C_PlayerInforReq, MakePacket<C_PlayerInforReq>);
-       _handler.Add((ushort)PacketID.C_PlayerInforReq, PacketHandler.C_PlayerInforReqHandler);
+      _onRecv.Add((ushort)PacketID.C_Chat, MakePacket<C_Chat>);
+       _handler.Add((ushort)PacketID.C_Chat, PacketHandler.C_ChatHandler);
 
     }
 

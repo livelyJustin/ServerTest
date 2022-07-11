@@ -8,6 +8,7 @@ namespace Server
     class Program
     {
         static Listener _listener = new Listener();
+        public static GameRoom Room = new GameRoom();
 
         static void Main(string[] args)
         {
@@ -25,9 +26,9 @@ namespace Server
             //Socket listenSocket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
 
-            //_listener.Init(endPoint, OnAcceptEventHandler)
-            _listener.Init(endPoint, () => { return new ClientSession(); });
+            _listener.Init(endPoint, () => { return SessionManager.instance.Generate(); });
             Console.WriteLine("Listening .... ");
+
             // 영업을 손님 받을 때 까지 해야하니 무한루프
             while (true)
             {
