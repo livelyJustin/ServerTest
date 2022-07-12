@@ -4,6 +4,7 @@
     {
         List<ClientSession> _sessions = new List<ClientSession>();
         object _lock = new object();
+
         public void BroadCast(ClientSession session, string chat)
         {
             S_Chat packet = new S_Chat();
