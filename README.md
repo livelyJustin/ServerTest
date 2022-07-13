@@ -174,4 +174,8 @@ https://velog.io/@livelyjuseok/개인공부-서버실습40-Packet-Generator6
 2022.07.13
 Chat
 https://velog.io/@livelyjuseok/개인공부-서버실습41-Chat1
+
+2022.07.14
+Chat2
+https://velog.io/@livelyjuseok/개인공부-서버실습42-Chat2
 </details>
