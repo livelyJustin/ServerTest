@@ -178,4 +178,8 @@ https://velog.io/@livelyjuseok/개인공부-서버실습41-Chat1
 2022.07.14
 Chat2
 https://velog.io/@livelyjuseok/개인공부-서버실습42-Chat2
+
+2022.07.16
+jObQueue
+https://velog.io/@livelyjuseok/개인공부-서버실습43-JobQueue1
 </details>
