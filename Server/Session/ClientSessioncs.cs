@@ -12,7 +12,8 @@ namespace Server
         public override void OnConnected(EndPoint end)
         {
             Console.WriteLine($"OnConnected : {end}");
-            Program.Room.Enter(this);
+
+            Program.Room.Push(() => Program.Room.Enter(this));
         }
 
         public override void OnRecvPacket(ArraySegment<byte> buffer)
@@ -26,7 +27,8 @@ namespace Server
             Console.WriteLine($"OnDisconnected : {end}");
             if(Room != null)
             {
-                Room.Leave(this);
+                GameRoom room = Room;
+                room.Push(() => room.Leave(this));
                 Room = null;
             }
         }
