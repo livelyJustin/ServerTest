@@ -16,19 +16,20 @@ namespace DummyClient
             IPEndPoint endPoint = new IPEndPoint(ipAddr, 2222); // 식당 주소, 뒷문 후문인지는 똑같음
 
             Connector connector = new Connector();
-            connector.Connect(endPoint, () => { return new ServerSession(); });
+            connector.Connect(endPoint, () => { return SessionManager.Instance.Generate(); }, 100);
 
             while (true)
             {
                 try
                 {
+                    SessionManager.Instance.SendForEach();
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine($"Somthing Wrong... {e}");
                 }
 
-                Thread.Sleep(1000);
+                Thread.Sleep(250); // 일반 mmo에서 이동 패킷은 1초에 4번 정도 보냄
             }
 
         }

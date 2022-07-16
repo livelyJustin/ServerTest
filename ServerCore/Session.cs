@@ -68,6 +68,14 @@ namespace ServerCore
         public abstract void OnSend(int numOfBytes);
         public abstract void OnDisconnected(EndPoint end);
 
+        void Clear()
+        {
+            lock (_lock)
+            {
+                _sendQueue.Clear();
+                _pendingList.Clear();
+            }
+        }
 
         public void Start(Socket socket)
         {
@@ -108,12 +116,16 @@ namespace ServerCore
 
             _socket.Shutdown(SocketShutdown.Both);
             _socket.Close();
+            Clear();
         }
 
         #region 네트워크 통신
 
         void RegisterSend()
         {
+            if (_disconnected == 1)
+                return;
+
             while (_sendQueue.Count > 0)
             {
                 ArraySegment<byte> buff = _sendQueue.Dequeue();
@@ -121,12 +133,17 @@ namespace ServerCore
             }
             _sendArgs.BufferList = _pendingList;
 
-            // _sendArgs.BufferList여기에 한 번에 처리할 것이 담겨서 아래에서 성공한다면 해당 일감들을 처리한다.
-            bool pending = _socket.SendAsync(_sendArgs);
-
-            if (pending == false)
+            try
             {
-                OnSendCompleted(null, _sendArgs);
+                // _sendArgs.BufferList여기에 한 번에 처리할 것이 담겨서 아래에서 성공한다면 해당 일감들을 처리한다.
+                bool pending = _socket.SendAsync(_sendArgs);
+
+                if (pending == false)
+                    OnSendCompleted(null, _sendArgs);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"RegisterSend Failed {e}");
             }
         }
 
@@ -165,17 +182,27 @@ namespace ServerCore
 
         void RegisterRecv()
         {
+            if (_disconnected == 1)
+                return;
+
             _recvBuffer.Clean();
             // 초기에 설정한 버퍼로 사용하는 것이 아닌 유동적으로 설정
             // write가 되어있는 영역 부터 작업 실행
             ArraySegment<byte> segment = _recvBuffer.WriteSegment;
             _recvArgs.SetBuffer(segment.Array, segment.Offset, segment.Count);
 
-            // 비동기
-            bool pending = _socket.ReceiveAsync(_recvArgs);
-            if (pending == false)
+            try
             {
-                OnRecvCompleted(null, _recvArgs);
+                // 비동기
+                bool pending = _socket.ReceiveAsync(_recvArgs);
+                if (pending == false)
+                {
+                    OnRecvCompleted(null, _recvArgs);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"RegisterRecv Fail {e}");
             }
         }
 

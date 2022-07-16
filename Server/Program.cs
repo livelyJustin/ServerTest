@@ -8,10 +8,10 @@ namespace Server
     class Program
     {
         static Listener _listener = new Listener();
+        public static GameRoom Room = new GameRoom();
 
         static void Main(string[] args)
         {
-            PacketManager.instance.Register(); // Register가 멀티 쓰레드 오류에서 벗어나기 위한 선언
             // DNS (Domain Name System) 
             // 하드 코딩으로 IP를 등록해두면 나중에 교체 등의 문제가 생길 수 있어 도메인으로 등록
 
@@ -25,9 +25,9 @@ namespace Server
             //Socket listenSocket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
 
-            //_listener.Init(endPoint, OnAcceptEventHandler)
-            _listener.Init(endPoint, () => { return new ClientSession(); });
+            _listener.Init(endPoint, () => { return SessionManager.instance.Generate(); });
             Console.WriteLine("Listening .... ");
+
             // 영업을 손님 받을 때 까지 해야하니 무한루프
             while (true)
             {
