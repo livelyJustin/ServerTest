@@ -16,7 +16,7 @@ namespace DummyClient
             IPEndPoint endPoint = new IPEndPoint(ipAddr, 2222); // 식당 주소, 뒷문 후문인지는 똑같음
 
             Connector connector = new Connector();
-            connector.Connect(endPoint, () => { return SessionManager.Instance.Generate(); }, 100);
+            connector.Connect(endPoint, () => { return SessionManager.Instance.Generate(); }, 300);
 
             while (true)
             {
