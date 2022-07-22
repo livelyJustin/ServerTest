@@ -182,4 +182,12 @@ https://velog.io/@livelyjuseok/개인공부-서버실습42-Chat2
 2022.07.16
 jObQueue
 https://velog.io/@livelyjuseok/개인공부-서버실습43-JobQueue1
+
+2022.07.19
+jObQueue2
+https://velog.io/@livelyjuseok/개인공부-서버실습44-JobQueue2
+
+2022.07.22
+패킷 모아 보내기
+https://velog.io/@livelyjuseok/개인공부-서버실습45-패킷-모아-전송
 </details>
