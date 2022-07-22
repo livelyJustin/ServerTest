@@ -24,20 +24,16 @@ namespace Server
             // 문지기가 들고 있는 핸드폰
             //Socket listenSocket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
-
             _listener.Init(endPoint, () => { return SessionManager.instance.Generate(); });
             Console.WriteLine("Listening .... ");
 
             // 영업을 손님 받을 때 까지 해야하니 무한루프
             while (true)
             {
-
-                // 손님의 문의가 왔을 때 입장
-                // -> 만약 손님이 입장을 안한다면? 실제는 이렇게 하진 않음 클라이언트가 입장안하면 아래는 안하고, 입장 해야만 할거임 
-                //Socket clientSocket = _listener.Accept(); // 리턴 값 소켓
+                Room.Push(() => Room.Flush());
+                Thread.Sleep(500);
             }
 
         }
     }
-
 }

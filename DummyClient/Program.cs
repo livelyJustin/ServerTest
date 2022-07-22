@@ -16,7 +16,7 @@ namespace DummyClient
             IPEndPoint endPoint = new IPEndPoint(ipAddr, 2222); // 식당 주소, 뒷문 후문인지는 똑같음
 
             Connector connector = new Connector();
-            connector.Connect(endPoint, () => { return SessionManager.Instance.Generate(); }, 300);
+            connector.Connect(endPoint, () => { return SessionManager.Instance.Generate(); }, 200);
 
             while (true)
             {
@@ -29,7 +29,7 @@ namespace DummyClient
                     Console.WriteLine($"Somthing Wrong... {e}");
                 }
 
-                Thread.Sleep(250); // 일반 mmo에서 이동 패킷은 1초에 4번 정도 보냄
+                Thread.Sleep(500); // 일반 mmo에서 이동 패킷은 1초에 4번 정도 보냄
             }
 
         }
