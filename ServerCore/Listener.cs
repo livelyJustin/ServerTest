@@ -11,7 +11,7 @@ namespace ServerCore
         //Action<Socket> _onAcceptHandler;
         Func<Session> _sessionFactory;
 
-        public void Init(IPEndPoint endPoint, Func<Session> sessionFactory)
+        public void Init(IPEndPoint endPoint, Func<Session> sessionFactory, int register = 10, int backlog = 200)
         {
             _listenSocket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             _sessionFactory += sessionFactory;
@@ -21,13 +21,16 @@ namespace ServerCore
 
             // 영업 시작
             // backlog = 최대 대기수(매개변수) 초과 시 fail 뜸
-            _listenSocket.Listen(10);
+            _listenSocket.Listen(backlog);
 
             // 최초 한 번은 args를 생성하고 이벤트 등록
             // 그 후로는 계속 재사용 가능
-            SocketAsyncEventArgs args = new SocketAsyncEventArgs();
-            args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptComplete);
-            RegisterAccept(args);
+            for (int i = 0; i < register; i++)
+            {
+                SocketAsyncEventArgs args = new SocketAsyncEventArgs();
+                args.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptComplete);
+                RegisterAccept(args);
+            }
         }
 
         void RegisterAccept(SocketAsyncEventArgs args)

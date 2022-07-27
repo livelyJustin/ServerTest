@@ -14,6 +14,7 @@ namespace ServerCore
         {
             // 내가 원하는 패킷이 다 올 때까지 기다렸다가 처리 할 예정
             int processLegnth = 0;
+            int packetCount = 0;
 
             while (true)
             {
@@ -30,12 +31,16 @@ namespace ServerCore
 
                 // 위 조건들을 통과했으면 이제 패킷 조립가능 ArraySegment struct 구조이기에 new를 써도 heap에 할당되지 않기에 괜찮다
                 OnRecvPacket(new ArraySegment<byte>(buffer.Array, buffer.Offset, datasize)); // buffer.Slice()도 가능
+                packetCount++;
 
                 processLegnth += datasize;
 
                 // 위에 작업들을 모두 통과했다면 첫 번 째 패킷은 끝난거기에 다음 패킷으로 넘겨버림
                 buffer = new ArraySegment<byte>(buffer.Array, buffer.Offset + datasize, buffer.Count - datasize);
             }
+
+            if (packetCount > 1)
+                Console.WriteLine($"패킷 모아 보내기: {packetCount} ");
 
             return processLegnth;
         }
@@ -50,7 +55,7 @@ namespace ServerCore
         Socket _socket;
         int _disconnected = 0;
 
-        RecvBuffer _recvBuffer = new RecvBuffer(1024);
+        RecvBuffer _recvBuffer = new RecvBuffer(65535);
 
         object _lock = new object();
 
@@ -91,16 +96,28 @@ namespace ServerCore
         }
 
         // 샌드는 리시브와 다르게 조금 더 복잡할 수 있음
+        public void Send(List<ArraySegment<byte>> sendBuffList)
+        {
+            if (sendBuffList.Count == 0)
+                return;
+            // 멀티 쓰레드환경이기에 동시에 상호배제, 임계구역을 만들기 위한 lock
+            lock (_lock)
+            {
+                foreach(ArraySegment<byte> sendBuff in sendBuffList)
+                    _sendQueue.Enqueue(sendBuff);
+
+                if (_pendingList.Count == 0)
+                    RegisterSend();
+            }
+        }
+
         public void Send(ArraySegment<byte> sendBuff)
         {
-            // 멀티 쓰레드환경이기에 동시에 상호배제, 임계구역을 만들기 위한 lock
             lock (_lock)
             {
                 _sendQueue.Enqueue(sendBuff);
                 if (_pendingList.Count == 0)
-                {
                     RegisterSend();
-                }
             }
         }
 

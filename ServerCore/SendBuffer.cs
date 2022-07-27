@@ -12,7 +12,7 @@ namespace ServerCore
         // 전역 변수가 사용은 편하지만 멀티 쓰레드 환경으로 고유한 공간을 만들어줌
         public static ThreadLocal<SendBuffer> CurrentBuffer = new ThreadLocal<SendBuffer>(() => { return null; });
 
-        public static int ChunkSize { get; set; } = 4096 * 100;
+        public static int ChunkSize { get; set; } = 65535 * 100;
 
         public static ArraySegment<byte> Open(int reserveSize)
         {
