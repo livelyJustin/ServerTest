@@ -190,4 +190,8 @@ https://velog.io/@livelyjuseok/개인공부-서버실습44-JobQueue2
 2022.07.22
 패킷 모아 보내기
 https://velog.io/@livelyjuseok/개인공부-서버실습45-패킷-모아-전송
+
+2022.07.27
+JobTimer
+https://velog.io/@livelyjuseok/jobtimer
 </details>
