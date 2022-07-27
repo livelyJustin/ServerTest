@@ -10,6 +10,12 @@ namespace Server
         static Listener _listener = new Listener();
         public static GameRoom Room = new GameRoom();
 
+        static void FlushRoom()
+        {
+            Room.Push(() => Room.Flush());
+            JobTimer.Instance.Push(FlushRoom, 500);
+        }
+
         static void Main(string[] args)
         {
             // DNS (Domain Name System) 
@@ -27,11 +33,11 @@ namespace Server
             _listener.Init(endPoint, () => { return SessionManager.instance.Generate(); });
             Console.WriteLine("Listening .... ");
 
-            // 영업을 손님 받을 때 까지 해야하니 무한루프
+            FlushRoom();
+
             while (true)
             {
-                Room.Push(() => Room.Flush());
-                Thread.Sleep(500);
+                JobTimer.Instance.Flush();
             }
 
         }
